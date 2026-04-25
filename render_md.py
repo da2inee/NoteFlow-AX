@@ -35,7 +35,12 @@ def action_items_table(items: list[dict]) -> str:
 
 def main() -> None:
     data = json.loads(IN_PATH.read_text(encoding="utf-8"))
+    OUT_PATH.write_text(render_markdown(data), encoding="utf-8")
+    print(str(OUT_PATH))
 
+
+def render_markdown(data: dict) -> str:
+    """out.json dict → 마크다운 본문 (process.py / web 캡처용)."""
     title = md_escape(str(data.get("title") or "")).strip()
     if not title:
         title = "정리 노트"
@@ -50,30 +55,29 @@ def main() -> None:
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     cat_line = ", ".join(str(c).strip() for c in categories if str(c).strip()) or "(없음)"
 
-    md = []
-    md.append(f"# {title}")
-    md.append("")
-    md.append(f"- 생성시간: {now}")
-    md.append(f"- 카테고리: {cat_line}")
-    md.append("")
-    md.append("## 요약")
-    md.append(summary if summary else "(없음)")
-    md.append("")
-    md.append("## 결정사항")
-    md.append(bullet_lines([str(x) for x in decisions]))
-    md.append("")
-    md.append("## 액션 아이템")
-    md.append(action_items_table(list(action_items)))
-    md.append("")
-    md.append("## 열린 질문")
-    md.append(bullet_lines([str(x) for x in open_questions]))
-    md.append("")
-    md.append("## 참고/링크")
-    md.append(bullet_lines([str(x) for x in references]))
-    md.append("")
-
-    OUT_PATH.write_text("\n".join(md), encoding="utf-8")
-    print(str(OUT_PATH))
+    md = [
+        f"# {title}",
+        "",
+        f"- 생성시간: {now}",
+        f"- 카테고리: {cat_line}",
+        "",
+        "## 요약",
+        summary if summary else "(없음)",
+        "",
+        "## 결정사항",
+        bullet_lines([str(x) for x in decisions]),
+        "",
+        "## 액션 아이템",
+        action_items_table(list(action_items)),
+        "",
+        "## 열린 질문",
+        bullet_lines([str(x) for x in open_questions]),
+        "",
+        "## 참고/링크",
+        bullet_lines([str(x) for x in references]),
+        "",
+    ]
+    return "\n".join(md)
 
 
 if __name__ == "__main__":

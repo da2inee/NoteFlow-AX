@@ -1,6 +1,15 @@
 .venv/
 __pycache__/
 *.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
 out.json
+out.md
+outputs/
 .env
+noteflow.env
+onenote_client_id.txt
+.msal_cache.json
+.token*
 .DS_Store
