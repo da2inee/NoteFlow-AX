@@ -451,6 +451,57 @@ def append_item_under_today_container(
     )
 
 
+def _text_block_html(*, label: str, text: str) -> str:
+    """
+    원노트 본문에 그대로 붙일 "전문" 블록.
+    - HTML은 escape하고 줄바꿈은 <br/>로 보존한다.
+    - <pre>는 클라이언트별로 스타일이 달라질 수 있어 <p> + <br/>로 통일.
+    """
+    esc_label = html.escape((label or "").strip() or "본문")
+    esc = html.escape(text or "")
+    esc = esc.replace("\r\n", "\n").replace("\r", "\n")
+    esc = esc.replace("\n", "<br/>")
+    return f"""
+<div data-tag="noteflow-fulltext" style="margin-top:8px; padding:10px; border:1px solid #e5e7eb; border-radius:10px; background:#fafafa;">
+  <p style="margin:0 0 6px 0;"><b>{esc_label}</b></p>
+  <p style="margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:12.8px; line-height:1.55;">{esc}</p>
+</div>
+""".strip()
+
+
+def append_fulltext_under_today_container(
+    token: str,
+    page_id: str,
+    *,
+    display_line: str,
+    full_text: str,
+    label: str = "원문",
+) -> None:
+    """
+    날짜 블록 아래에 항목 1개를 추가하되,
+    첫 줄 요약 + 전문(원문/정리본)을 함께 붙인다.
+    """
+    ymd = today_ymd_seoul()
+    did = ensure_day_container(token, page_id, ymd=ymd)
+    try:
+        page_html = get_page_content_html(token, page_id)
+    except Exception:
+        page_html = ""
+    cont = _day_container_has_item_entries(page_html, did=did)
+    entry = md_to_html_append_day_entry(
+        display_line=display_line,
+        is_continuation=cont,
+        time_hhmm=now_hhmm_seoul() if cont else "",
+    )
+    inner = f"""
+<div data-tag="noteflow-item">
+  {entry}
+  {_text_block_html(label=label, text=full_text)}
+</div>
+""".strip()
+    append_html(token, page_id, target=f"#{did}", inner_html=inner, mark_item=True)
+
+
 def append_to_page_content(token: str, page_id: str, inner_html: str) -> None:
     """기본: body 끝에 append."""
     append_html(token, page_id, target="body", inner_html=inner_html)
@@ -494,6 +545,46 @@ def new_topic_page_with_day_entry(
     item_inner = md_to_html_append_day_entry(display_line=display_line)
     wrap = "nf" + secrets.token_hex(6)
     item_block = f'<div data-id="{wrap}" data-tag="noteflow-item">{item_inner}</div>'
+    return f"""<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>{tesc}</title>
+</head>
+<body>
+  <h1 style="font-size:11px;font-weight:500;color:#9ca3af;letter-spacing:0.01em;">{tesc}</h1>
+  <div id="{did}" data-noteflow-day="{yattr}">
+    <h2><b>{dsafe}</b></h2>
+    {item_block}
+  </div>
+</body>
+</html>"""
+
+
+def new_topic_page_with_day_entry_fulltext(
+    *,
+    page_title: str,
+    ymd: str,
+    display_line: str,
+    full_text: str,
+    label: str = "원문",
+) -> str:
+    """
+    토픽 첫 저장 시: 날짜 블록 아래에 "첫 줄 요약 + 전문"을 함께 넣는다.
+    """
+    tesc = html.escape((page_title or "").strip() or "NoteFlow")
+    did = day_container_data_id(ymd)
+    dsafe = html.escape(ymd)
+    yattr = html.escape(ymd)
+    entry = md_to_html_append_day_entry(display_line=display_line)
+    inner = f"""
+<div data-tag="noteflow-item">
+  {entry}
+  {_text_block_html(label=label, text=full_text)}
+</div>
+""".strip()
+    wrap = "nf" + secrets.token_hex(6)
+    item_block = f'<div data-id="{wrap}" data-tag="noteflow-item">{inner}</div>'
     return f"""<!DOCTYPE html>
 <html>
 <head>

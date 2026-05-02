@@ -22,53 +22,65 @@ def html_page(body: str, *, title: str = "NoteFlow AX") -> bytes:
   <style>
     :root {{
       --onenote-purple: #7719aa;
-      --bg: #f5f6f8;
+      --onenote-dark: #4c0b78;
+      --accent: #ede3f7;
+      --accent-strong: #f6edff;
+      --bg: #f7f5fb;
       --panel: #ffffff;
-      --muted: #6b7280;
-      --border: #e5e7eb;
-      --text: #111827;
+      --muted: #667085;
+      --border: #e7e0ef;
+      --text: #171321;
+      --shadow: 0 18px 45px rgba(76, 11, 120, 0.10);
     }}
     * {{ box-sizing: border-box; }}
     body {{
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
-      background: var(--bg);
+      background:
+        radial-gradient(circle at top left, rgba(119,25,170,0.16), transparent 34rem),
+        linear-gradient(180deg, #fbf8ff 0%, var(--bg) 46%, #ffffff 100%);
       color: var(--text);
+      min-height: 100vh;
     }}
     .topbar {{
-      height: 52px;
-      background: var(--onenote-purple);
+      min-height: 60px;
+      background: linear-gradient(135deg, var(--onenote-dark), var(--onenote-purple));
       color: #fff;
       display: flex;
       align-items: center;
-      padding: 0 16px;
-      font-weight: 600;
+      padding: 0 22px;
+      font-weight: 800;
       letter-spacing: 0.2px;
+      box-shadow: 0 10px 30px rgba(76, 11, 120, 0.22);
     }}
     .topbar small {{
-      opacity: 0.85;
+      opacity: 0.88;
       font-weight: 500;
       margin-left: 10px;
     }}
     .wrap {{
       display: grid;
-      grid-template-columns: 260px 1fr;
-      gap: 16px;
-      padding: 16px;
-      max-width: 1200px;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 18px;
+      padding: 22px;
+      max-width: 1180px;
       margin: 0 auto;
     }}
     .panel {{
       background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 18px;
       overflow: hidden;
+      box-shadow: var(--shadow);
     }}
     .sidebar {{
-      padding: 12px;
+      padding: 16px;
+      align-self: start;
+      position: sticky;
+      top: 18px;
     }}
     .sidebar h3 {{
-      margin: 6px 0 10px;
+      margin: 4px 0 12px;
       font-size: 14px;
       color: var(--muted);
       font-weight: 700;
@@ -78,42 +90,69 @@ def html_page(body: str, *, title: str = "NoteFlow AX") -> bytes:
     .secbtn {{
       width: 100%;
       text-align: left;
-      padding: 10px 10px;
-      border-radius: 10px;
+      padding: 11px 12px;
+      border-radius: 12px;
       border: 1px solid transparent;
-      background: transparent;
+      background: #fff;
       cursor: pointer;
       font-size: 14px;
+      color: var(--text);
+      margin-bottom: 8px;
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
     }}
     .secbtn:hover {{
-      background: #f3f4f6;
-      border-color: #eef0f2;
+      background: var(--accent-strong);
+      border-color: #dcc6ee;
+      transform: translateY(-1px);
     }}
     .main {{
-      padding: 14px;
+      padding: 18px;
     }}
-    .row {{ margin: 12px 0; }}
-    label {{ font-size: 13px; font-weight: 600; }}
+    .wrap > .main:only-child {{
+      grid-column: 1 / -1;
+    }}
+    .hero {{
+      padding: 18px 18px 16px;
+      margin: -18px -18px 18px;
+      background: linear-gradient(135deg, #fff 0%, var(--accent-strong) 100%);
+      border-bottom: 1px solid var(--border);
+    }}
+    .hero h1 {{
+      margin: 0 0 8px;
+      font-size: 24px;
+      line-height: 1.25;
+      letter-spacing: -0.03em;
+    }}
+    .row {{ margin: 14px 0; }}
+    label {{ font-size: 13px; font-weight: 700; color: #34263f; }}
     textarea {{
       width: 100%;
-      min-height: 320px;
+      min-height: 340px;
       font-size: 14px;
       line-height: 1.55;
-      padding: 12px;
-      border-radius: 12px;
+      padding: 14px;
+      border-radius: 14px;
       border: 1px solid var(--border);
       background: #fff;
       resize: vertical;
+      box-shadow: inset 0 1px 2px rgba(17,24,39,0.03);
+    }}
+    textarea:focus,
+    input[type="text"]:focus {{
+      border-color: var(--onenote-purple);
+      box-shadow: 0 0 0 4px rgba(119,25,170,0.12);
+      outline: none;
     }}
     input[type="text"] {{
       width: 100%;
-      padding: 10px;
-      border-radius: 10px;
+      padding: 11px 12px;
+      border-radius: 12px;
       border: 1px solid var(--border);
       font-size: 14px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }}
-    .hint {{ color: var(--muted); font-size: 13px; line-height: 1.45; }}
-    code {{ background: #f3f4f6; padding: 2px 6px; border-radius: 6px; }}
+    .hint {{ color: var(--muted); font-size: 13px; line-height: 1.55; }}
+    code {{ background: var(--accent); color: var(--onenote-dark); padding: 2px 6px; border-radius: 7px; }}
     .actions {{
       display: flex;
       gap: 10px;
@@ -121,33 +160,67 @@ def html_page(body: str, *, title: str = "NoteFlow AX") -> bytes:
       flex-wrap: wrap;
     }}
     .primary {{
-      background: var(--onenote-purple);
-      border: 1px solid rgba(0,0,0,0.08);
+      background: linear-gradient(135deg, var(--onenote-purple), #9b45cf);
+      border: 1px solid rgba(76,11,120,0.18);
       color: #fff;
-      padding: 10px 14px;
-      border-radius: 10px;
+      padding: 11px 18px;
+      border-radius: 12px;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
+      box-shadow: 0 10px 22px rgba(119,25,170,0.22);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }}
+    .primary:hover {{ transform: translateY(-1px); box-shadow: 0 12px 26px rgba(119,25,170,0.28); }}
     .primary:disabled {{ opacity: 0.6; cursor: not-allowed; }}
     .pill {{
       display: inline-flex;
       gap: 8px;
       align-items: center;
-      padding: 8px 10px;
+      padding: 9px 11px;
       border: 1px solid var(--border);
       border-radius: 999px;
       background: #fff;
       font-size: 13px;
-      color: var(--muted);
+      color: #4b4157;
+      box-shadow: 0 4px 12px rgba(76,11,120,0.05);
     }}
-    pre {{ background: #0b1020; color: #e6e6e6; padding: 12px; border-radius: 10px; overflow: auto; }}
-    a {{ color: #0b57d0; }}
+    pre {{ background: #14051f; color: #f5effa; padding: 14px; border-radius: 14px; overflow: auto; }}
+    a {{ color: var(--onenote-purple); font-weight: 700; text-decoration: none; }}
+    a:hover {{ text-decoration: underline; }}
+    .status {{
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      padding: 12px 14px;
+    }}
+    .result-table {{
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+    }}
+    .result-table th,
+    .result-table td {{
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      padding: 10px;
+      vertical-align: top;
+    }}
+    .result-table th {{
+      background: var(--accent-strong);
+      color: var(--onenote-dark);
+      font-size: 13px;
+    }}
+    .result-table tr:last-child td {{ border-bottom: 0; }}
     .overlay {{
       position: fixed;
       inset: 0;
-      background: rgba(17,24,39,0.40);
+      background: rgba(23, 19, 33, 0.50);
+      backdrop-filter: blur(4px);
       display: none;
       align-items: center;
       justify-content: center;
@@ -157,9 +230,10 @@ def html_page(body: str, *, title: str = "NoteFlow AX") -> bytes:
     .overlay .card {{
       width: min(520px, 100%);
       background: #fff;
-      border-radius: 14px;
+      border-radius: 18px;
       border: 1px solid var(--border);
-      padding: 16px;
+      padding: 18px;
+      box-shadow: 0 22px 60px rgba(17,24,39,0.24);
     }}
     .spinner {{
       width: 22px;
@@ -173,6 +247,12 @@ def html_page(body: str, *, title: str = "NoteFlow AX") -> bytes:
       margin-right: 10px;
     }}
     @keyframes spin {{ to {{ transform: rotate(360deg); }} }}
+    @media (max-width: 760px) {{
+      .wrap {{ grid-template-columns: 1fr; padding: 14px; }}
+      .sidebar {{ position: static; }}
+      .topbar {{ padding: 0 16px; }}
+      .hero h1 {{ font-size: 21px; }}
+    }}
   </style>
 </head>
 <body>
@@ -224,7 +304,13 @@ FORM_HTML = """
   </div>
 
   <div class="panel main">
-    <div class="row hint">
+    <div class="hero">
+      <h1>메모를 원노트로 빠르게 정리</h1>
+      <div class="hint">
+        원문 저장, 자동 분류, 여러 메모 일괄 처리를 한 화면에서 실행합니다.
+      </div>
+    </div>
+    <div class="row status hint">
       노트북: <code>Note_20260416_171212</code> (고정) · 필수: <code>ONENOTE_CLIENT_ID</code> (또는 프로젝트 루트 <code>.env</code>)
       · <a href="/auth" target="_blank" rel="noreferrer">로그인/권한 동의</a>
     </div>
@@ -232,6 +318,15 @@ FORM_HTML = """
       <div class="row">
         <label>텍스트</label><br/>
         <textarea name="text" placeholder="여기에 메모/대화 내용을 붙여넣으세요."></textarea>
+      </div>
+      <div class="row actions">
+        <label class="pill"><input type="checkbox" name="multi" value="1" /> 여러 메모 한 번에</label>
+        <span class="hint">구분선으로 분리해 N건을 한 번 클릭으로 처리합니다.</span>
+      </div>
+      <div class="row">
+        <label>메모 구분선(여러 메모일 때)</label><br/>
+        <input type="text" name="delimiter" value="---memo---" />
+        <div class="hint">예: 텍스트에 <code>---memo---</code> 가 단독 한 줄로 있으면 그 기준으로 나눕니다.</div>
       </div>
       <div class="row actions">
         <label class="pill"><input type="checkbox" name="raw" value="1" checked /> 원문 그대로 저장</label>
@@ -243,12 +338,24 @@ FORM_HTML = """
         <input type="text" name="section" placeholder="예: cos 개발 (비우면 자동 분류)" />
       </div>
       <div class="row actions">
-        <button id="saveBtn" class="primary" type="submit">원노트에 저장</button>
+        <button id="saveBtn" class="primary" type="submit">원노트에 저장하기</button>
       </div>
     </form>
   </div>
 </div>
 """.replace("{SIDEBAR_BUTTONS}", SIDEBAR_BUTTONS)
+
+
+def split_memos(raw: str, *, delimiter: str) -> list[str]:
+    text = (raw or "").strip()
+    if not text:
+        return []
+    d = (delimiter or "").strip()
+    if not d:
+        return [text]
+    pattern = re.compile(rf"(?:^|\n)\s*{re.escape(d)}\s*(?:\n|$)", re.MULTILINE)
+    parts = pattern.split(text)
+    return [p.strip() for p in parts if p.strip()]
 
 
 def rule_based_section(text: str) -> str | None:
@@ -394,6 +501,9 @@ def pick_page_keyword(section: str, text: str) -> str | None:
     t = (text or "").casefold()
     t_nospace = re.sub(r"\s+", "", t)
     section = (section or "").strip()
+    # to-do는 한 페이지 인박스로 고정(항상 같은 페이지에 쌓기)
+    if section == "to-do":
+        return "inbox"
     keywords_by_section: dict[str, list[str]] = {
         "to-do": [
             "마감",
@@ -450,6 +560,58 @@ def pick_page_keyword(section: str, text: str) -> str | None:
         if re.sub(r"\s+", "", kk) in t_nospace:
             return k
     return None
+
+
+def extract_todos(text: str) -> list[str]:
+    """
+    메모에서 '할 일'만 가볍게 추출(룰 기반). 원본 저장은 그대로 하고, to-do 인박스에만 추가로 쌓는다.
+
+    목표: 오탐을 줄이기 위해 '해야/해주세요/올려/확인/회신/정리' 같은 실행 동사 중심으로만 뽑는다.
+    """
+    out: list[str] = []
+    seen: set[str] = set()
+    for raw_line in (text or "").splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        # 채팅 머리말/메타 제외
+        if line.startswith("[") and line.endswith("]") and len(line) < 30:
+            continue
+        line = re.sub(r"^[\-\*\u2022]\s*", "", line)  # bullet 제거
+        if len(line) < 3:
+            continue
+
+        triggers = [
+            "해야",
+            "해줘",
+            "해주세요",
+            "부탁",
+            "올려",
+            "올려줘",
+            "정리",
+            "확인",
+            "회신",
+            "전달",
+            "메일",
+            "공유",
+            "리뷰",
+            "체크",
+            "추가",
+            "반영",
+        ]
+        if not any(t in line for t in triggers):
+            continue
+
+        # 질문형은 할 일로 뽑지 않음(문의/확인요청은 원문만 저장)
+        if line.endswith("?") or "가능할까요" in line or "되나요" in line:
+            continue
+
+        s = re.sub(r"\s+", " ", line).strip()
+        if s in seen:
+            continue
+        seen.add(s)
+        out.append(s)
+    return out
 
 
 def build_page_title(section: str, keyword: str | None, fallback_text: str) -> str:
@@ -518,6 +680,8 @@ class Handler(BaseHTTPRequestHandler):
         raw = self.rfile.read(length).decode("utf-8", errors="replace")
         form = parse_qs(raw)
         text = (form.get("text") or [""])[0]
+        multi = bool((form.get("multi") or [""])[0])
+        delimiter = (form.get("delimiter") or ["---memo---"])[0]
         raw_mode = bool((form.get("raw") or [""])[0])
         fast_mode = bool((form.get("fast") or [""])[0])
         section_override = (form.get("section") or [""])[0].strip() or None
@@ -556,75 +720,139 @@ class Handler(BaseHTTPRequestHandler):
 
             notebook_id = onenote_publish.pick_notebook_id(token, None)
 
-            # 섹션(탭) 결정: override > rule-based > LLM
-            rb = rule_based_section(text)
-            section_name = section_override or rb
-            if not section_name and not fast_mode:
-                section_name = process.classify_section_llm(raw=text, model=process.MODEL)
-            if not section_name and fast_mode:
-                section_name = "ax 과제"
+            memos = split_memos(text, delimiter=delimiter) if multi else [text.strip()]
+            if not memos:
+                return self._respond_error("텍스트가 비어 있습니다. 내용을 붙여넣고 다시 시도하세요.")
 
-            # 페이지 키워드/제목
-            page_kw = pick_page_keyword(section_name, text)
-            title = build_page_title(section_name, page_kw, text)
+            results: list[dict[str, str]] = []
+            for idx, memo in enumerate(memos, start=1):
+                # 섹션(탭) 결정: override > rule-based > LLM
+                rb = rule_based_section(memo)
+                section_name = section_override or rb
+                if not section_name and not fast_mode:
+                    section_name = process.classify_section_llm(raw=memo, model=process.MODEL)
+                if not section_name and fast_mode:
+                    section_name = "ax 과제"
 
-            # 본문/메타
-            if raw_mode:
-                md = text
-                data = {"title": title, "recommended_section": section_name}
-            else:
-                data = process.process_text(raw=text, model=process.MODEL, temperature=0)
-                data["recommended_section"] = section_name
-                data["title"] = title
-                md = render_md.render_markdown(data)
+                # 페이지 키워드/제목
+                page_kw = pick_page_keyword(section_name, memo)
+                title = build_page_title(section_name, page_kw, memo)
 
-            section_id = onenote_publish.ensure_section_id(token, notebook_id, section_name)
-            marker: str | None
-            if page_kw:
-                marker = onenote_publish.topic_title_marker(section_name, page_kw)
-            else:
-                marker = None
-
-            existing_id = onenote_publish.find_page_id_for_topic_marker(
-                token, section_id, marker) if marker else None
-
-            if existing_id:
-                display = onenote_publish.first_nonempty_line(text)
-                onenote_publish.append_item_under_today_container(
-                    token, existing_id, display_line=display
-                )
-                link = onenote_publish.get_onenote_client_url_for_page(
-                    token, existing_id) or ""
-                op_line = f"""같은 토픽으로 보는 기존 페이지(제목에
-<code>{html.escape(marker or "")}</code> 포함)에
-<strong>이어 붙였습니다</strong>. 새로고침해 확인하세요."""
-            else:
-                display = onenote_publish.first_nonempty_line(text)
-                # 모든 새 페이지는 날짜 블록 포맷으로 통일한다.
-                ymd = onenote_publish.today_ymd_seoul()
-                html_doc = onenote_publish.new_topic_page_with_day_entry(
-                    page_title=title, ymd=ymd, display_line=display
-                )
-                result = onenote_publish.create_page(token, section_id, html_doc)
-                link = ((result.get("links") or {}).get("oneNoteClientUrl", {}) or {}).get("href")
-                if marker:
-                    op_line = f"""<code>{html.escape(section_name)}</code> 탭에
-<strong>새 페이지</strong>를 만들었습니다. 다음 메모는 제목에
-<code>{html.escape(marker)}</code>가 있으면 이 페이지에 합쳐집니다."""
+                # 본문/메타 (원노트에는 '첫 줄 + 전문'으로 저장)
+                if raw_mode:
+                    full_text = memo
+                    full_label = "원문"
                 else:
-                    op_line = f"""<code>{html.escape(section_name)}</code> 탭에
-<strong>새 페이지</strong>를 만들었습니다. (페이지 키워드가 없으면
-항상 새 페이지입니다.)"""
+                    data = process.process_text(raw=memo, model=process.MODEL, temperature=0)
+                    data["recommended_section"] = section_name
+                    data["title"] = title
+                    full_text = render_md.render_markdown(data)
+                    full_label = "정리본"
+
+                section_id = onenote_publish.ensure_section_id(token, notebook_id, section_name)
+                marker: str | None = onenote_publish.topic_title_marker(section_name, page_kw) if page_kw else None
+                existing_id = (
+                    onenote_publish.find_page_id_for_topic_marker(token, section_id, marker) if marker else None
+                )
+
+                if existing_id:
+                    display = onenote_publish.first_nonempty_line(memo)
+                    onenote_publish.append_fulltext_under_today_container(
+                        token,
+                        existing_id,
+                        display_line=display,
+                        full_text=full_text,
+                        label=full_label,
+                    )
+                    link = onenote_publish.get_onenote_client_url_for_page(token, existing_id) or ""
+                    op_line = f"""기존 페이지(제목에 <code>{html.escape(marker or "")}</code> 포함)에 <strong>이어 붙임</strong>"""
+                else:
+                    display = onenote_publish.first_nonempty_line(memo)
+                    ymd = onenote_publish.today_ymd_seoul()
+                    html_doc = onenote_publish.new_topic_page_with_day_entry_fulltext(
+                        page_title=title,
+                        ymd=ymd,
+                        display_line=display,
+                        full_text=full_text,
+                        label=full_label,
+                    )
+                    created = onenote_publish.create_page(token, section_id, html_doc)
+                    link = ((created.get("links") or {}).get("oneNoteClientUrl", {}) or {}).get("href") or ""
+                    op_line = "<strong>새 페이지 생성</strong>"
+
+                # 할 일이 보이면 to-do 인박스에도 추가
+                todos = extract_todos(memo)
+                if todos:
+                    todo_section_id = onenote_publish.ensure_section_id(token, notebook_id, "to-do")
+                    todo_marker = onenote_publish.topic_title_marker("to-do", "inbox")
+                    todo_page_id = onenote_publish.find_page_id_for_topic_marker(token, todo_section_id, todo_marker)
+                    todo_title = build_page_title("to-do", "inbox", "to-do inbox")
+                    if not todo_page_id:
+                        ymd2 = onenote_publish.today_ymd_seoul()
+                        html_doc2 = onenote_publish.new_topic_page_with_day_entry(
+                            page_title=todo_title, ymd=ymd2, display_line=todos[0]
+                        )
+                        created2 = onenote_publish.create_page(token, todo_section_id, html_doc2)
+                        todo_page_id = created2.get("id") or todo_page_id
+                        rest = todos[1:]
+                    else:
+                        rest = todos
+                    if todo_page_id:
+                        for t in rest:
+                            onenote_publish.append_item_under_today_container(token, todo_page_id, display_line=t)
+
+                results.append(
+                    {
+                        "idx": str(idx),
+                        "section": section_name,
+                        "kw": page_kw or "",
+                        "title": title,
+                        "op": op_line,
+                        "link": link,
+                    }
+                )
+
+            rows = []
+            for r in results:
+                link_html = (
+                    f'<a href="{html.escape(r["link"])}" target="_blank" rel="noreferrer">열기</a>'
+                    if r.get("link")
+                    else "(링크 없음)"
+                )
+                rows.append(
+                    "<tr>"
+                    f"<td>{html.escape(r['idx'])}</td>"
+                    f"<td>{html.escape(r['section'])}</td>"
+                    f"<td>{html.escape(r['kw']) or '(없음)'}</td>"
+                    f"<td>{html.escape(r['title'])}</td>"
+                    f"<td>{r['op']}</td>"
+                    f"<td>{link_html}</td>"
+                    "</tr>"
+                )
+
             body = f"""
-<h2>완료</h2>
-<div class="hint">
-  {op_line}
+<div class="wrap">
+  <div class="panel main">
+    <div class="hero">
+      <h1>저장 완료</h1>
+      <div class="hint">총 <b>{len(results)}</b>건 처리했습니다.</div>
+    </div>
+<div class="row">
+  <table class="result-table">
+    <tr>
+      <th>#</th>
+      <th>탭</th>
+      <th>키워드</th>
+      <th>제목</th>
+      <th>처리</th>
+      <th>원노트</th>
+    </tr>
+    {''.join(rows)}
+  </table>
 </div>
-<div class="row"><b>탭</b>: {section_name}</div>
-<div class="row"><b>페이지 키워드</b>: {page_kw or '(없음)'}</div>
-<div class="row"><b>이번 항목 제목</b>: {html.escape(title)}</div>
-<div class="row"><b>원노트</b>: {'<a href="' + link + '" target="_blank" rel="noreferrer">열기</a>' if link else '(링크 없음)'}</div>
 <div class="row"><a href="/">다시 입력</a></div>
+  </div>
+</div>
 """
             return self._respond_html(body)
         except Exception as e:  # pragma: no cover
@@ -643,9 +871,16 @@ class Handler(BaseHTTPRequestHandler):
 
     def _respond_error(self, message: str) -> None:
         body = f"""
-<h2>실패</h2>
-<pre>{message}</pre>
-<div class="row"><a href="/">돌아가기</a></div>
+<div class="wrap">
+  <div class="panel main">
+    <div class="hero">
+      <h1>실패</h1>
+      <div class="hint">아래 내용을 확인한 뒤 다시 시도하세요.</div>
+    </div>
+    <pre>{message}</pre>
+    <div class="row"><a href="/">돌아가기</a></div>
+  </div>
+</div>
 """
         self._respond_html(body, status=400)
 

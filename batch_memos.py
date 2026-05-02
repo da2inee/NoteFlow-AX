@@ -27,6 +27,8 @@ from pathlib import Path
 import process
 import render_md
 
+DEFAULT_INBOX_DIR = Path.home() / "Documents" / "NoteFlowInbox"
+
 
 def _slug(title: str, index: int) -> str:
     t = (title or "").strip()
@@ -67,9 +69,15 @@ def _chunks_from_dir(dir_path: Path) -> list[tuple[str, str]]:
 
 def main() -> None:
     p = argparse.ArgumentParser(description="여러 메모 배치 구조화 (Ollama)")
-    g = p.add_mutually_exclusive_group(required=True)
+    g = p.add_mutually_exclusive_group(required=False)
     g.add_argument("--dir", type=Path, metavar="DIR", help="폴더 내 각 .txt = 메모 1개")
     g.add_argument("--file", type=Path, metavar="FILE", help="단일 텍스트 파일")
+    p.add_argument(
+        "--inbox",
+        type=Path,
+        default=None,
+        help=f"프로젝트 밖 수거함 폴더(기본: {DEFAULT_INBOX_DIR}). 지정 시 --dir 대신 이 폴더의 .txt를 읽습니다.",
+    )
     p.add_argument(
         "--split",
         action="store_true",
@@ -90,6 +98,13 @@ def main() -> None:
     p.add_argument("--temperature", type=float, default=0)
     args = p.parse_args()
 
+    # 아무 입력도 안 주면, 프로젝트 밖 기본 수거함을 사용
+    if not args.dir and not args.file and not args.inbox:
+        args.inbox = DEFAULT_INBOX_DIR
+
+    if args.inbox and (args.dir or args.file):
+        p.error("--inbox 는 --dir/--file 과 함께 사용할 수 없습니다.")
+
     if args.split and not args.file:
         p.error("--split 은 --file 과 함께만 사용할 수 있습니다.")
     if args.split and args.dir:
@@ -101,8 +116,25 @@ def main() -> None:
         chunks = _chunks_from_file(args.file, args.delimiter, split=True)
         items = [(f"part_{i+1:03d}", c) for i, c in enumerate(chunks)]
     else:
-        assert args.dir
-        items = _chunks_from_dir(args.dir)
+        dir_path = args.dir or args.inbox
+        assert dir_path
+        dir_path = dir_path.expanduser()
+        if not dir_path.exists():
+            dir_path.mkdir(parents=True, exist_ok=True)
+            raise SystemExit(
+                "\n".join(
+                    [
+                        f"수거함 폴더를 만들었습니다: {dir_path}",
+                        "",
+                        "여기에 메모를 .txt로 저장한 뒤 다시 실행하세요.",
+                        "예: 001.txt, 002.txt ... (파일 1개 = 메모 1개)",
+                        "",
+                        "다시 실행:",
+                        f"  python batch_memos.py --inbox \"{dir_path}\"",
+                    ]
+                )
+            )
+        items = _chunks_from_dir(dir_path)
 
     out_dir: Path = args.out_dir
     out_dir.mkdir(parents=True, exist_ok=True)

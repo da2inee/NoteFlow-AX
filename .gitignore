@@ -13,3 +13,7 @@ onenote_client_id.txt
 .msal_cache.json
 .token*
 .DS_Store
+
+# Local dev server (web_capture)
+.noteflow_server.log
+.noteflow_server.pid
