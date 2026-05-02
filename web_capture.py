@@ -159,6 +159,13 @@ def html_page(body: str, *, title: str = "NoteFlow AX") -> bytes:
       align-items: center;
       flex-wrap: wrap;
     }}
+    .lblrow {{
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px 12px;
+      margin-bottom: 6px;
+    }}
     .primary {{
       background: linear-gradient(135deg, var(--onenote-purple), #9b45cf);
       border: 1px solid rgba(76,11,120,0.18);
@@ -334,7 +341,10 @@ FORM_HTML = """
         <span class="hint">빠른 모드는 룰/선택만 사용해서 훨씬 빠릅니다(애매한 경우 기본은 ax 과제).</span>
       </div>
       <div class="row">
-        <label>섹션(탭) 이름(선택)</label><br/>
+        <div class="lblrow">
+          <label>섹션(탭) 이름(선택)</label>
+          <span class="hint">원노트에 해당 이름 탭이 없으면 저장할 때 새 섹션으로 만듭니다. 비우면 자동 분류예요.</span>
+        </div>
         <input type="text" name="section" placeholder="예: cos 개발 (비우면 자동 분류)" />
       </div>
       <div class="row actions">
